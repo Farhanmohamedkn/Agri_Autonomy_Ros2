@@ -6,21 +6,19 @@ package_name = 'agri_fake_localization'
 
 setup(
     name=package_name,
-    version='0.1.0',
+    version='0.0.1',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'),
-            glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Farhan',
+    maintainer='farhan',
     maintainer_email='mohamedfarhankn@gmail.com',
-    description='Fake localization for agricultural UGV testing',
-    license='MIT',
+    description='Fake localization using perfect kinematic motion model',
+    license='Apache License 2.0',
     entry_points={
         'console_scripts': [
             'fake_localization_node = agri_fake_localization.fake_localization_node:main',

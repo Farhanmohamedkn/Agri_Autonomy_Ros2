@@ -22,7 +22,7 @@ class FakeLocalizationNode(Node):
 
         # Parameters
         self.declare_parameter('dt', 0.1)
-        self.declare_parameter('parent_frame', 'map')
+        self.declare_parameter('parent_frame', 'odom')
         self.declare_parameter('child_frame', 'base_link')
 
         self.dt = float(self.get_parameter('dt').value)
