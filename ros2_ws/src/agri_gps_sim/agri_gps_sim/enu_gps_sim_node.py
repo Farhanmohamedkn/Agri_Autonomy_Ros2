@@ -1,4 +1,3 @@
-import math
 import random
 import rclpy
 from rclpy.node import Node
@@ -12,7 +11,7 @@ class EnuGpsSimulator(Node):
         super().__init__('enu_gps_simulator')
 
         # Parameters
-        self.declare_parameter('noise_std', 0.3)     # meters
+        self.declare_parameter('noise_std', 0.3)     # meters (1-sigma)
         self.declare_parameter('publish_rate', 5.0) # Hz
 
         self.noise_std = float(self.get_parameter('noise_std').value)
@@ -20,7 +19,7 @@ class EnuGpsSimulator(Node):
 
         self.current_pose = None
 
-        # Subscriber: true robot pose
+        # Subscriber: simulated ground-truth pose (odom)
         self.create_subscription(
             PoseStamped,
             '/robot/pose',
@@ -28,7 +27,7 @@ class EnuGpsSimulator(Node):
             10
         )
 
-        # Publisher: ENU GPS
+        # Publisher: simulated GPS in map frame
         self.gps_pub = self.create_publisher(
             PoseWithCovarianceStamped,
             '/gps/enu',
@@ -41,7 +40,8 @@ class EnuGpsSimulator(Node):
         )
 
         self.get_logger().info(
-            f"ENU GPS simulator started (noise={self.noise_std} m, rate={self.rate} Hz)"
+            f"ENU GPS simulator started "
+            f"(noise={self.noise_std} m, rate={self.rate} Hz)"
         )
 
     def pose_callback(self, msg: PoseStamped):
@@ -51,29 +51,34 @@ class EnuGpsSimulator(Node):
         if self.current_pose is None:
             return
 
-        # Add Gaussian noise
+        # Add Gaussian noise to simulate GPS
         x = self.current_pose.pose.position.x + random.gauss(0.0, self.noise_std)
         y = self.current_pose.pose.position.y + random.gauss(0.0, self.noise_std)
 
         gps_msg = PoseWithCovarianceStamped()
-        gps_msg.header.stamp = self.get_clock().now().to_msg()
+
+        # 🔴 Use the same timestamp for consistency
+        gps_msg.header.stamp = self.current_pose.header.stamp
         gps_msg.header.frame_id = 'map'
 
         gps_msg.pose.pose.position.x = x
         gps_msg.pose.pose.position.y = y
         gps_msg.pose.pose.position.z = 0.0
 
+        # Orientation is unknown for GPS
         gps_msg.pose.pose.orientation.w = 1.0
 
-        # Covariance (x, y accuracy)
-        cov = self.noise_std ** 2
+        # Covariance matrix (6x6, row-major)
+        pos_cov = self.noise_std ** 2
+        very_large = 1e6
+
         gps_msg.pose.covariance = [
-            cov, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, cov, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 999.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 999.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 999.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 999.0
+            pos_cov, 0.0,      0.0,      0.0,      0.0,      0.0,
+            0.0,     pos_cov,  0.0,      0.0,      0.0,      0.0,
+            0.0,     0.0,      very_large,0.0,      0.0,      0.0,
+            0.0,     0.0,      0.0,      very_large,0.0,      0.0,
+            0.0,     0.0,      0.0,      0.0,      very_large,0.0,
+            0.0,     0.0,      0.0,      0.0,      0.0,      very_large
         ]
 
         self.gps_pub.publish(gps_msg)

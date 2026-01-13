@@ -4,19 +4,19 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 
 
-class PoseCovarianceWrapper(Node):
+class PoseCovWrapper(Node):
 
     def __init__(self):
         super().__init__('pose_cov_wrapper')
 
-        # ---- Parameters (tunable later) ----
-        self.declare_parameter('position_stddev', 0.2)   # meters
-        self.declare_parameter('yaw_stddev', 0.1)        # radians
+        # Parameters (easy to tune later)
+        self.declare_parameter('xy_covariance', 0.05)
+        self.declare_parameter('yaw_covariance', 0.02)
 
-        self.pos_std = float(self.get_parameter('position_stddev').value)
-        self.yaw_std = float(self.get_parameter('yaw_stddev').value)
+        self.xy_cov = float(self.get_parameter('xy_covariance').value)
+        self.yaw_cov = float(self.get_parameter('yaw_covariance').value)
 
-        # Subscriber: raw pose (no covariance)
+        # Subscriber: Pose without covariance
         self.create_subscription(
             PoseStamped,
             '/robot/pose',
@@ -24,8 +24,8 @@ class PoseCovarianceWrapper(Node):
             10
         )
 
-        # Publisher: pose with covariance
-        self.pub = self.create_publisher(
+        # Publisher: Pose with covariance
+        self.pose_cov_pub = self.create_publisher(
             PoseWithCovarianceStamped,
             '/robot/pose_cov',
             10
@@ -33,34 +33,34 @@ class PoseCovarianceWrapper(Node):
 
         self.get_logger().info(
             f"Pose covariance wrapper started "
-            f"(σ_xy={self.pos_std} m, σ_yaw={self.yaw_std} rad)"
+            f"(xy_cov={self.xy_cov}, yaw_cov={self.yaw_cov})"
         )
 
-    def pose_callback(self, msg: PoseStamped):
-        out = PoseWithCovarianceStamped()
+    def pose_callback(self, pose_msg: PoseStamped):
+        pose_cov = PoseWithCovarianceStamped()
 
-        # Copy header & pose
-        out.header = msg.header
-        out.pose.pose = msg.pose
+        # 🔴 CRITICAL: preserve header exactly
+        pose_cov.header = pose_msg.header
+
+        # Copy pose
+        pose_cov.pose.pose = pose_msg.pose
 
         # Build covariance matrix (6x6, row-major)
-        cov = [0.0] * 36
+        pose_cov.pose.covariance = [
+            self.xy_cov, 0.0,         0.0,         0.0,         0.0,         0.0,
+            0.0,         self.xy_cov, 0.0,         0.0,         0.0,         0.0,
+            0.0,         0.0,         999.0,       0.0,         0.0,         0.0,
+            0.0,         0.0,         0.0,         999.0,       0.0,         0.0,
+            0.0,         0.0,         0.0,         0.0,         999.0,       0.0,
+            0.0,         0.0,         0.0,         0.0,         0.0,         self.yaw_cov
+        ]
 
-        cov[0]  = self.pos_std ** 2    # x
-        cov[7]  = self.pos_std ** 2    # y
-        cov[14] = 1e6                  # z (unused in 2D)
-        cov[21] = 1e6                  # roll
-        cov[28] = 1e6                  # pitch
-        cov[35] = self.yaw_std ** 2    # yaw
-
-        out.pose.covariance = cov
-
-        self.pub.publish(out)
+        self.pose_cov_pub.publish(pose_cov)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = PoseCovarianceWrapper()
+    node = PoseCovWrapper()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
