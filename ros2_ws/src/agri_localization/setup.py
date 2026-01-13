@@ -6,32 +6,27 @@ package_name = 'agri_localization'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.0.1',
     packages=[package_name],
     data_files=[
-        # Package index
         ('share/ament_index/resource_index/packages',
-         ['resource/' + package_name]),
-
-        # Package manifest
+            ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
 
-        # Install launch files
+        # Launch files
         (os.path.join('share', package_name, 'launch'),
-         glob('launch/*.launch.py')),
+            glob('launch/*.launch.py')),
 
-        # Install config files
+        # Config files
         (os.path.join('share', package_name, 'config'),
-         glob('config/*.yaml')),
+            glob('config/*.yaml')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='farhan',
     maintainer_email='mohamedfarhankn@gmail.com',
-    description='Localization stack (EKF) for agricultural UGV',
+    description='Localization stack (EKF + helpers)',
     license='Apache License 2.0',
-
-    # 🔴 THIS PART IS REQUIRED
     entry_points={
         'console_scripts': [
             'pose_cov_wrapper_node = agri_localization.pose_cov_wrapper_node:main',

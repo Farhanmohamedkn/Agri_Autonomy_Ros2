@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 import os
 from glob import glob
 
@@ -6,8 +6,8 @@ package_name = 'agri_ugv_bringup'
 
 setup(
     name=package_name,
-    version='0.0.1',
-    packages=find_packages(exclude=['test']),
+    version='0.1.0',
+    packages=[package_name],
     data_files=[
         # Package index
         ('share/ament_index/resource_index/packages',
@@ -19,21 +19,11 @@ setup(
         # Launch files
         (os.path.join('share', package_name, 'launch'),
             glob('launch/*.launch.py')),
-
-        # Config / params (future-proof)
-        (os.path.join('share', package_name, 'config'),
-            glob('config/*')),
-        (os.path.join('share', package_name, 'params'),
-            glob('params/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='Farhan',
     maintainer_email='mohamedfarhankn@gmail.com',
-    description='Bringup package for agricultural UGV autonomy',
+    description='Bringup launch for agricultural UGV (localization + mission + control)',
     license='MIT',
-    tests_require=['pytest'],
-    entry_points={
-        'console_scripts': [],
-    },
 )

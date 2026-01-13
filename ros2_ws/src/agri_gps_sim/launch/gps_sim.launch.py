@@ -5,9 +5,9 @@ def generate_launch_description():
     return LaunchDescription([
 
         Node(
-            package='agri_fake_localization',
-            executable='fake_localization_node',
-            name='fake_localization',
+            package='agri_gps_sim',
+            executable='enu_gps_sim_node',
+            name='gps_sim',
             output='screen'
         ),
 

@@ -5,9 +5,9 @@ def generate_launch_description():
     return LaunchDescription([
 
         Node(
-            package='agri_fake_localization',
-            executable='fake_localization_node',
-            name='fake_localization',
+            package='agri_localization',
+            executable='pose_cov_wrapper_node',
+            name='pose_cov_wrapper',
             output='screen'
         ),
 
