@@ -31,7 +31,8 @@ def generate_launch_description():
     # -------------------------
     # Package share directories
     # -------------------------
-    fake_loc_pkg = get_package_share_directory('agri_fake_localization')
+    # fake_loc_pkg = get_package_share_directory('agri_fake_localization')
+    wheel_odom_pkg = get_package_share_directory('agri_wheel_odometry')
     gps_sim_pkg = get_package_share_directory('agri_gps_sim')
     localization_pkg = get_package_share_directory('agri_localization')
     mission_pkg = get_package_share_directory('agri_mission_planner')
@@ -41,23 +42,29 @@ def generate_launch_description():
     # -------------------------
     # Simulation localization stack
     # -------------------------
-    fake_localization_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(fake_loc_pkg, 'launch', 'fake_localization.launch.py')
-        ),
-        condition=IfCondition(use_sim)
-    )
+    # fake_localization_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(fake_loc_pkg, 'launch', 'fake_localization.launch.py')
+    #     ),
+    #     condition=IfCondition(use_sim)
+    # )
 
-    pose_cov_wrapper_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(localization_pkg, 'launch', 'pose_cov_wrapper.launch.py')
-        ),
-        condition=IfCondition(use_sim)
-    )
+    # pose_cov_wrapper_launch = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(localization_pkg, 'launch', 'pose_cov_wrapper.launch.py')
+    #     ),
+    #     condition=IfCondition(use_sim)
+    # )
 
     gps_sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(gps_sim_pkg, 'launch', 'gps_sim.launch.py')
+        ),
+        condition=IfCondition(use_sim)
+    )
+    wheel_odom_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(wheel_odom_pkg, 'launch', 'wheel_odometry.launch.py')
         ),
         condition=IfCondition(use_sim)
     )
@@ -129,8 +136,7 @@ def generate_launch_description():
         robot_state_pub,
         
 
-        fake_localization_launch,
-        pose_cov_wrapper_launch,
+        wheel_odom_launch,
         gps_sim_launch,
 
         ekf_launch,

@@ -12,18 +12,17 @@ ekf_filter_node:
     base_link_frame: base_link
     world_frame: map
 
-    # Local odom (pose only)
-    pose0: /robot/pose_cov
-    pose0_queue_size: 10
-    pose0_differential: false
-    pose0_relative: false
-    pose0_config: [
-      true,  true,  false,
-      false, false, true,
-      false, false, false,
-      false, false, false,
-      false, false, false
+    odom0: /wheel/odometry
+    odom0_config: [
+      true,  true,  false,   # x, y, z
+      false, false, true,    # roll, pitch, yaw
+      true,  true,  false,   # vx, vy, vz
+      false, false, true,    # vroll, vpitch, vyaw
+      false, false, false    # ax, ay, az
     ]
+    odom0_queue_size: 10
+    odom0_differential: false
+    odom0_relative: false
 
     # GPS (x,y only)
     pose1: /gps/enu
