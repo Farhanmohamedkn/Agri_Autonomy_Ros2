@@ -98,11 +98,12 @@ def generate_launch_description():
     )
     )
     
-    joint_state_pub = IncludeLaunchDescription(
+    wheel_anim_launch = IncludeLaunchDescription(
     PythonLaunchDescriptionSource(
-        os.path.join(description_pkg, 'launch', 'joint_state_publisher.launch.py')
+        os.path.join(controller_pkg, 'launch', 'wheel_animation.launch.py')
     )
     )
+
 
 
     # -------------------------
@@ -126,7 +127,7 @@ def generate_launch_description():
         declare_use_rviz,
 
         robot_state_pub,
-        joint_state_pub,
+        
 
         fake_localization_launch,
         pose_cov_wrapper_launch,
@@ -135,6 +136,7 @@ def generate_launch_description():
         ekf_launch,
         mission_launch,
         controller_launch,
+        wheel_anim_launch,
 
         rviz_node,
     ])

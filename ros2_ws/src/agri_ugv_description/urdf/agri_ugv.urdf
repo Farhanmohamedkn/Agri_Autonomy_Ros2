@@ -50,6 +50,18 @@
       <material name="black"/>
     </visual>
 
+    <!-- Stripe to show rotation (DEBUG – exaggerated) -->
+  <visual>
+    <!-- Push it OUTSIDE the wheel -->
+    <origin xyz="0.30 0 0" rpy="-1.5708 0 0"/>
+    <geometry>
+      <!-- Make it big and flat -->
+      <box size="0.10 0.20 0.03"/>
+    </geometry>
+    <material name="stripe_red"/>
+  </visual>
+
+
   </link>
   
   

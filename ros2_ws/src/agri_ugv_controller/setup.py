@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pure_pursuit_node = agri_ugv_controller.pure_pursuit_node:main',
+            'skid_steer_wheel_state_publisher = agri_ugv_controller.skid_steer_wheel_state_publisher:main',
         ],
     },
 )
