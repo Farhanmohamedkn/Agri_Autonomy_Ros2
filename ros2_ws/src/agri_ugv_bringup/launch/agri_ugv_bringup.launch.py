@@ -36,6 +36,7 @@ def generate_launch_description():
     localization_pkg = get_package_share_directory('agri_localization')
     mission_pkg = get_package_share_directory('agri_mission_planner')
     controller_pkg = get_package_share_directory('agri_ugv_controller')
+    description_pkg = get_package_share_directory('agri_ugv_description')
 
     # -------------------------
     # Simulation localization stack
@@ -87,6 +88,22 @@ def generate_launch_description():
             os.path.join(controller_pkg, 'launch', 'controller.launch.py')
         )
     )
+    
+    # -------------------------
+    # robot state, joint state publisher and URDF stack
+    # -------------------------
+    robot_state_pub = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+        os.path.join(description_pkg, 'launch', 'robot_state_publisher.launch.py')
+    )
+    )
+    
+    joint_state_pub = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+        os.path.join(description_pkg, 'launch', 'joint_state_publisher.launch.py')
+    )
+    )
+
 
     # -------------------------
     # RViz (optional)
@@ -107,6 +124,9 @@ def generate_launch_description():
     return LaunchDescription([
         declare_use_sim,
         declare_use_rviz,
+
+        robot_state_pub,
+        joint_state_pub,
 
         fake_localization_launch,
         pose_cov_wrapper_launch,

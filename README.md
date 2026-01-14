@@ -1,6 +1,6 @@
 # Agri Autonomy ROS 2
 
-ROS 2–based autonomy framework for agricultural UAVs and mobile robots.
+ROS 2–based autonomy framework for agricultural UGVs and mobile robots.
 
 ## Goals
 - GPS-based navigation in agricultural environments
@@ -10,7 +10,7 @@ ROS 2–based autonomy framework for agricultural UAVs and mobile robots.
 
 ## Scope
 This repository focuses on autonomy software for outdoor agricultural robots,
-including UAVs and ground vehicles. Initial development targets GPS-only navigation
+including UGVs. Initial development targets GPS-only navigation
 in simulation, followed by higher-precision localization methods.
 
 ## Technologies
