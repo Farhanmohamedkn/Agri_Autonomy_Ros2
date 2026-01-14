@@ -87,14 +87,7 @@ def generate_launch_description():
         )
     )
 
-    # -------------------------
-    # Controller
-    # -------------------------
-    controller_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(controller_pkg, 'launch', 'controller.launch.py')
-        )
-    )
+   
     
     # -------------------------
     # robot state, joint state publisher and URDF stack
@@ -141,7 +134,6 @@ def generate_launch_description():
 
         ekf_launch,
         mission_launch,
-        controller_launch,
         wheel_anim_launch,
 
         rviz_node,

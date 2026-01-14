@@ -1,0 +1,164 @@
+# =========================================================
+# AMCL (DISABLED – we use EKF + GPS)
+# =========================================================
+amcl:
+  ros__parameters:
+    enabled: false
+
+
+# =========================================================
+# Behavior Tree Navigator
+# =========================================================
+bt_navigator:
+  ros__parameters:
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odometry/filtered
+    bt_loop_duration: 10
+    default_server_timeout: 20
+
+
+# =========================================================
+# Planner Server (works on empty costmap)
+# =========================================================
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 1.0
+
+    planner_plugins: ["GridBased"]
+
+    GridBased:
+      plugin: nav2_navfn_planner/NavfnPlanner
+      tolerance: 5.0        # allows goal acceptance in open space
+      use_astar: false
+      allow_unknown: true
+
+
+# =========================================================
+# Controller Server (Regulated Pure Pursuit)
+# =========================================================
+controller_server:
+  ros__parameters:
+    odom_topic: /odometry/filtered
+    controller_frequency: 20.0
+
+    controller_plugins: ["FollowPath"]
+
+    FollowPath:
+      plugin: nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController
+
+      # --- Speeds ---
+      desired_linear_vel: 0.5
+      min_linear_vel: 0.0
+      max_linear_accel: 0.5
+      max_angular_vel: 0.6
+      max_angular_accel: 0.8
+
+      # --- Lookahead ---
+      lookahead_dist: 1.5
+      use_velocity_scaled_lookahead_dist: true
+      min_lookahead_dist: 0.8
+      max_lookahead_dist: 2.5
+
+      # --- Regulation ---
+      regulate_linear_velocity: true
+      allow_reversing: false
+
+      # --- Stability ---
+      use_collision_detection: false
+      use_heading_from_path: true
+
+
+# =========================================================
+# Global Costmap (NO static map)
+# =========================================================
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      global_frame: map
+      robot_base_frame: base_link
+
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      resolution: 0.5
+
+      rolling_window: false
+      track_unknown_space: false
+
+      plugins: ["inflation_layer"]
+
+      inflation_layer:
+        plugin: nav2_costmap_2d::InflationLayer
+        inflation_radius: 0.5
+        cost_scaling_factor: 3.0
+
+
+# =========================================================
+# Local Costmap (rolling, robot-centric)
+# =========================================================
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      global_frame: odom
+      robot_base_frame: base_link
+
+      update_frequency: 5.0
+      publish_frequency: 2.0
+
+      rolling_window: true
+      width: 10.0
+      height: 10.0
+      resolution: 0.1
+
+      track_unknown_space: false
+
+      plugins: ["inflation_layer"]
+
+      inflation_layer:
+        plugin: nav2_costmap_2d::InflationLayer
+        inflation_radius: 0.4
+        cost_scaling_factor: 3.0
+
+
+# =========================================================
+# Velocity Smoother (ONLY publisher to /cmd_vel)
+# =========================================================
+velocity_smoother:
+  ros__parameters:
+    enabled: true
+    smoothing_frequency: 20.0
+    feedback: OPEN_LOOP
+
+    odom_topic: /odometry/filtered
+
+    cmd_vel_in_topic: /cmd_vel_nav
+    cmd_vel_out_topic: /cmd_vel
+
+    max_velocity: [0.5, 0.0, 0.6]
+    min_velocity: [-0.5, 0.0, -0.6]
+
+    max_accel: [0.5, 0.0, 0.8]
+    max_decel: [-0.5, 0.0, -0.8]
+
+    velocity_timeout: 0.5
+
+
+# =========================================================
+# Map Server (EXPLICITLY DISABLED)
+# =========================================================
+map_server:
+  ros__parameters:
+    enabled: false
+
+
+# =========================================================
+# Lifecycle Manager
+# =========================================================
+lifecycle_manager:
+  ros__parameters:
+    autostart: true
+    node_names:
+      - planner_server
+      - controller_server
+      - bt_navigator
+      - velocity_smoother
