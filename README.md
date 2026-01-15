@@ -68,8 +68,77 @@ Nav2’s Regulated Pure Pursuit controller is planned for production navigation.
 ## Project Status
 
 🟡 Localization & Odometry Stable
-🚧 Navigation stack integration (Nav2) in progress
+🚧 Navigation stack integration (Nav2) Done
 🚧 Gazebo + ros2_control integration planned
 
-This repository is under active development, with a focus on correctness, realism, and scalability to real agricultural robots.
+## ▶️ How to Run
+
+### 1️⃣ Build the workspace
+
+```bash
+cd ~/agri_autonomy_ros2/Agri_Autonomy_Ros2/ros2_ws
+colcon build
+source install/setup.bash
+```
+
+---
+
+### 2️⃣ Launch robot bringup (localization + mission planner)
+
+This launches the **core system**:
+
+* Robot description & TF
+* Wheel odometry
+* EKF localization (`map → odom → base_link`)
+* Mission planner (starts and waits for Nav2)
+
+```bash
+ros2 launch agri_ugv_bringup bringup.launch.py
+```
+
+At this point:
+
+* The robot is localized and visible in RViz
+* `/mission/path` is published (coverage plan)
+* The mission planner is **idle and waiting** for Nav2’s action server
+* The robot **will not move yet**
+
+---
+
+### 3️⃣ Launch Nav2 (navigation stack)
+
+Nav2 is launched **separately** and connects to the already-running system.
+
+```bash
+ros2 launch agri_nav2_bringup nav2.launch.py
+```
+
+Once Nav2 starts:
+
+* The mission planner detects the Nav2 action server
+* Coverage navigation begins automatically
+* Goals are sent sequentially
+* The robot starts moving
+
+---
+
+## 🧭 RViz Visualization
+
+Recommended RViz displays:
+
+* **RobotModel** → `/robot_description`
+* **TF** → verify `map → odom → base_link`
+* **Path** → `/mission/path` 
+* **Odometry** → `/odometry/filtered`
+
+---
+
+## 🧩 Design Notes
+
+* Nav2 is **not part of bringup by design**
+* Bringup remains lightweight and reusable
+* Mission logic is decoupled from navigation
+* Nav2 can be replaced, tuned, or disabled without changing bringup
+
+
 
