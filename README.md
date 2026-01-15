@@ -38,20 +38,7 @@ This repository focuses on the core autonomy stack for outdoor agricultural robo
 map → odom → base_link
 ```
 
-- Fake localization fully removed
-
-- Architecture ready for GPS, RTK, and IMU fusion
-
-- Motion Control (Baseline)
-
-- Custom pure pursuit–style path follower
-
-- Designed for low-speed agricultural UGV motion
-
-- Known oscillation limits documented (controller to be replaced by Nav2)
-
-⚠️ Note: The current controller is intentionally simple and used for early validation.
-Nav2’s Regulated Pure Pursuit controller is planned for production navigation.
+- Nav2 is integrated for autonmous navigation
 
 ## Technologies
 
