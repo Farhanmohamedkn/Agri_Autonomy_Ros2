@@ -1,5 +1,5 @@
 agri_mission_planner:
   ros__parameters:
-    field_length: 100.0
-    field_width: 50.0
-    row_spacing: 6.0
+    field_length: 25.0
+    field_width: 25.0
+    row_spacing: 5.0
